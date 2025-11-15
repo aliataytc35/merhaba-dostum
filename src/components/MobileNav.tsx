@@ -15,7 +15,7 @@ export const MobileNav = () => {
         <Link to="/search" className={isActive("/search") ? "text-foreground" : "text-muted-foreground"}>
           <Search className="w-6 h-6" />
         </Link>
-        <Link to="/add" className="text-muted-foreground">
+        <Link to="/create" className={isActive("/create") ? "text-foreground" : "text-muted-foreground"}>
           <PlusSquare className="w-6 h-6" />
         </Link>
         <Link to="/activity" className={isActive("/activity") ? "text-foreground" : "text-muted-foreground"}>

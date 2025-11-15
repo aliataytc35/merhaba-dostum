@@ -1,35 +1,13 @@
 import { MobileNav } from "@/components/MobileNav";
 import { PostCard } from "@/components/PostCard";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut } from "lucide-react";
+import { usePosts } from "@/hooks/usePosts";
+import { LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { signOut } = useAuth();
-  // Demo posts
-  const posts = [
-    {
-      username: "izmir_gezgini",
-      postImage: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800",
-      likes: 1234,
-      caption: "İzmir'in güzel günbatımı 🌅",
-      timeAgo: "2 saat önce"
-    },
-    {
-      username: "ege_denizi",
-      postImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
-      likes: 892,
-      caption: "Deniz, güneş ve huzur ☀️",
-      timeAgo: "5 saat önce"
-    },
-    {
-      username: "kordon_manzarasi",
-      postImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800",
-      likes: 2156,
-      caption: "Kordon'da akşam yürüyüşü 🚶‍♂️",
-      timeAgo: "1 gün önce"
-    }
-  ];
+  const { posts, loading, toggleLike } = usePosts();
 
   return (
     <div className="min-h-screen bg-background pb-14">
@@ -50,9 +28,34 @@ const Index = () => {
 
       {/* Feed */}
       <div className="max-w-md mx-auto">
-        {posts.map((post, index) => (
-          <PostCard key={index} {...post} />
-        ))}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <p className="text-muted-foreground mb-2">Henüz gönderi yok</p>
+            <p className="text-sm text-muted-foreground">
+              İlk gönderiyi paylaşmak için + butonuna tıklayın
+            </p>
+          </div>
+        ) : (
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              id={post.id}
+              username={post.profile.username}
+              avatarUrl={post.profile.avatar_url}
+              postImage={post.image_url}
+              likes={post.likes_count}
+              caption={post.caption}
+              createdAt={post.created_at}
+              isLiked={post.is_liked}
+              commentsCount={post.comments_count}
+              onLikeToggle={() => toggleLike(post.id)}
+            />
+          ))
+        )}
       </div>
 
       {/* Bottom Navigation */}
