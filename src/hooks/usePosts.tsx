@@ -24,7 +24,6 @@ export const usePosts = () => {
 
   const fetchPosts = async () => {
     try {
-      // Fetch posts with profiles
       const { data: postsData, error: postsError } = await supabase
         .from("posts")
         .select(`
@@ -34,50 +33,38 @@ export const usePosts = () => {
         .order("created_at", { ascending: false });
 
       if (postsError) throw postsError;
-
       if (!postsData) {
         setPosts([]);
         return;
       }
 
-      // Fetch likes count and user's likes
-      const postsWithLikes = await Promise.all(
-        postsData.map(async (post) => {
-          // Get likes count
-          const { count: likesCount } = await supabase
-            .from("likes")
-            .select("*", { count: "exact", head: true })
-            .eq("post_id", post.id);
+      const postIds = postsData.map(p => p.id);
+      
+      const [likesResult, commentsResult, userLikesResult] = await Promise.all([
+        supabase.from("likes").select("post_id").in("post_id", postIds),
+        supabase.from("comments").select("post_id").in("post_id", postIds),
+        user ? supabase.from("likes").select("post_id").eq("user_id", user.id).in("post_id", postIds) : Promise.resolve({ data: [] })
+      ]);
 
-          // Check if current user liked this post
-          let isLiked = false;
-          if (user) {
-            const { data: likeData } = await supabase
-              .from("likes")
-              .select("id")
-              .eq("post_id", post.id)
-              .eq("user_id", user.id)
-              .maybeSingle();
-            isLiked = !!likeData;
-          }
+      const likesMap = (likesResult.data || []).reduce((acc, like) => {
+        acc[like.post_id] = (acc[like.post_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-          // Get comments count
-          const { count: commentsCount } = await supabase
-            .from("comments")
-            .select("*", { count: "exact", head: true })
-            .eq("post_id", post.id);
+      const commentsMap = (commentsResult.data || []).reduce((acc, comment) => {
+        acc[comment.post_id] = (acc[comment.post_id] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-          return {
-            ...post,
-            profile: post.profile,
-            likes_count: likesCount || 0,
-            is_liked: isLiked,
-            comments_count: commentsCount || 0,
-          };
-        })
-      );
+      const userLikesSet = new Set((userLikesResult.data || []).map(like => like.post_id));
 
-      setPosts(postsWithLikes);
+      setPosts(postsData.map(post => ({
+        ...post,
+        profile: post.profile,
+        likes_count: likesMap[post.id] || 0,
+        is_liked: userLikesSet.has(post.id),
+        comments_count: commentsMap[post.id] || 0,
+      })));
     } catch (error) {
       console.error("Error fetching posts:", error);
     } finally {

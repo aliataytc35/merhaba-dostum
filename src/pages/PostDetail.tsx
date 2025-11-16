@@ -48,6 +48,40 @@ const PostDetail = () => {
 
   useEffect(() => {
     fetchPostData();
+
+    if (!postId) return;
+
+    const channel = supabase
+      .channel(`post-${postId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "comments",
+          filter: `post_id=eq.${postId}`,
+        },
+        () => {
+          fetchPostData();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "likes",
+          filter: `post_id=eq.${postId}`,
+        },
+        () => {
+          fetchPostData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [postId, user]);
 
   const fetchPostData = async () => {
