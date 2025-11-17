@@ -231,13 +231,21 @@ const PostDetail = () => {
       <div className="max-w-md mx-auto">
         {/* Post Header */}
         <div className="flex items-center gap-3 p-3 border-b border-border">
-          <Avatar className="w-8 h-8">
+          <Avatar 
+            className="w-8 h-8 cursor-pointer"
+            onClick={() => navigate(`/profile/${post.profile.username}`)}
+          >
             <AvatarImage src={post.profile.avatar_url || undefined} />
             <AvatarFallback>
               {post.profile.username.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="font-semibold text-sm">{post.profile.username}</span>
+          <span 
+            className="font-semibold text-sm cursor-pointer hover:text-muted-foreground transition-colors"
+            onClick={() => navigate(`/profile/${post.profile.username}`)}
+          >
+            {post.profile.username}
+          </span>
         </div>
 
         {/* Post Image */}
@@ -282,7 +290,10 @@ const PostDetail = () => {
         <div className="divide-y divide-border">
           {comments.map((comment) => (
             <div key={comment.id} className="flex gap-3 p-3">
-              <Avatar className="w-8 h-8 flex-shrink-0">
+              <Avatar 
+                className="w-8 h-8 flex-shrink-0 cursor-pointer"
+                onClick={() => navigate(`/profile/${comment.profile.username}`)}
+              >
                 <AvatarImage src={comment.profile.avatar_url || undefined} />
                 <AvatarFallback>
                   {comment.profile.username.charAt(0).toUpperCase()}
@@ -290,7 +301,10 @@ const PostDetail = () => {
               </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm">
-                  <span className="font-semibold mr-2">
+                  <span 
+                    className="font-semibold mr-2 cursor-pointer hover:text-muted-foreground transition-colors"
+                    onClick={() => navigate(`/profile/${comment.profile.username}`)}
+                  >
                     {comment.profile.username}
                   </span>
                   {comment.content}
