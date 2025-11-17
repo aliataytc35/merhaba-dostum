@@ -1,5 +1,6 @@
 import { MobileNav } from "@/components/MobileNav";
 import { PostCard } from "@/components/PostCard";
+import { StoriesBar } from "@/components/StoriesBar";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts } from "@/hooks/usePosts";
 import { LogOut, Loader2 } from "lucide-react";
@@ -25,6 +26,9 @@ const Index = () => {
           <LogOut className="w-5 h-5" />
         </Button>
       </header>
+
+      {/* Stories */}
+      <StoriesBar />
 
       {/* Feed */}
       <div className="max-w-md mx-auto">
