@@ -1,4 +1,4 @@
-import { Home, Search, PlusSquare, Heart, User } from "lucide-react";
+import { Home, Search, PlusSquare, MessageCircle, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export const MobileNav = () => {
@@ -18,8 +18,8 @@ export const MobileNav = () => {
         <Link to="/create" className={isActive("/create") ? "text-foreground" : "text-muted-foreground"}>
           <PlusSquare className="w-6 h-6" />
         </Link>
-        <Link to="/activity" className={isActive("/activity") ? "text-foreground" : "text-muted-foreground"}>
-          <Heart className="w-6 h-6" />
+        <Link to="/messages" className={isActive("/messages") || location.pathname.startsWith("/messages/") ? "text-foreground" : "text-muted-foreground"}>
+          <MessageCircle className="w-6 h-6" />
         </Link>
         <Link to="/profile" className={isActive("/profile") ? "text-foreground" : "text-muted-foreground"}>
           <User className="w-6 h-6" />
