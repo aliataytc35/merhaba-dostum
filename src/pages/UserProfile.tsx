@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useFollow } from "@/hooks/useFollow";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Grid3X3, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { Loader2, Grid3X3, ArrowLeft } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
 
 interface ProfileData {
+  id: string;
   username: string;
   full_name: string | null;
   bio: string | null;
@@ -21,52 +23,51 @@ interface Post {
   image_url: string;
 }
 
-const Profile = () => {
-  const { user, signOut } = useAuth();
+const UserProfile = () => {
+  const { username } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const { isFollowing, toggleFollow, loading: followLoading } = useFollow(profile?.id);
 
   useEffect(() => {
-    if (user) {
-      fetchProfileData();
-    }
-  }, [user]);
+    fetchProfileData();
+  }, [username]);
 
   const fetchProfileData = async () => {
-    if (!user) return;
-
     try {
-      const [profileResult, postsResult] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("username, full_name, bio, avatar_url, followers_count, following_count")
-          .eq("id", user.id)
-          .single(),
-        supabase
-          .from("posts")
-          .select("id, image_url")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false }),
-      ]);
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, username, full_name, bio, avatar_url, followers_count, following_count")
+        .eq("username", username)
+        .single();
 
-      if (profileResult.error) throw profileResult.error;
-      if (postsResult.error) throw postsResult.error;
+      if (profileError) throw profileError;
 
-      setProfile(profileResult.data);
-      setPosts(postsResult.data || []);
+      // Eğer kendi profilimizse yönlendir
+      if (profileData.id === user?.id) {
+        navigate("/profile");
+        return;
+      }
+
+      const { data: postsData, error: postsError } = await supabase
+        .from("posts")
+        .select("id, image_url")
+        .eq("user_id", profileData.id)
+        .order("created_at", { ascending: false });
+
+      if (postsError) throw postsError;
+
+      setProfile(profileData);
+      setPosts(postsData || []);
     } catch (error) {
       console.error("Error fetching profile:", error);
-      toast.error("Profil yüklenemedi");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
   };
 
   if (loading) {
@@ -87,20 +88,19 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 bg-background border-b border-border z-40 px-4 h-14 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">{profile.username}</h1>
+      <header className="sticky top-0 bg-background border-b border-border z-40 px-4 h-14 flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleSignOut}
+          onClick={() => navigate(-1)}
           className="text-muted-foreground hover:text-foreground"
         >
-          <LogOut className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5" />
         </Button>
+        <h1 className="text-lg font-semibold">{profile.username}</h1>
       </header>
 
       <div className="max-w-md mx-auto">
-        {/* Profile Info */}
         <div className="p-4">
           <div className="flex items-center gap-6 mb-4">
             <Avatar className="w-20 h-20">
@@ -137,12 +137,22 @@ const Profile = () => {
             )}
           </div>
 
-          <Button variant="outline" className="w-full">
-            Profili Düzenle
+          <Button
+            variant={isFollowing ? "outline" : "default"}
+            className="w-full"
+            onClick={toggleFollow}
+            disabled={followLoading}
+          >
+            {followLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : isFollowing ? (
+              "Takipten Çık"
+            ) : (
+              "Takip Et"
+            )}
           </Button>
         </div>
 
-        {/* Posts Grid */}
         <div className="border-t border-border">
           <div className="flex items-center justify-center gap-2 py-3 border-b border-border">
             <Grid3X3 className="w-5 h-5" />
@@ -150,15 +160,8 @@ const Profile = () => {
           </div>
 
           {posts.length === 0 ? (
-            <div className="py-16 text-center">
-              <div className="text-muted-foreground mb-2">Henüz gönderi yok</div>
-              <Button
-                variant="link"
-                onClick={() => navigate("/create")}
-                className="text-primary"
-              >
-                İlk gönderini paylaş
-              </Button>
+            <div className="py-16 text-center text-muted-foreground">
+              Henüz gönderi yok
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-1">
@@ -179,8 +182,10 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      <MobileNav />
     </div>
   );
 };
 
-export default Profile;
+export default UserProfile;

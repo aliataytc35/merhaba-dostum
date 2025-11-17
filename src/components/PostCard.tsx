@@ -41,7 +41,10 @@ export const PostCard = ({
     <div className="border-b border-border">
       {/* Header */}
       <div className="flex items-center gap-3 p-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] p-[2px]">
+        <div 
+          onClick={() => navigate(`/profile/${username}`)}
+          className="w-8 h-8 rounded-full bg-gradient-to-br from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] p-[2px] cursor-pointer"
+        >
           <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
             <Avatar className="w-6 h-6">
               <AvatarImage src={avatarUrl || undefined} />
@@ -51,7 +54,12 @@ export const PostCard = ({
             </Avatar>
           </div>
         </div>
-        <span className="font-semibold text-sm">{username}</span>
+        <span 
+          onClick={() => navigate(`/profile/${username}`)}
+          className="font-semibold text-sm cursor-pointer hover:text-muted-foreground transition-colors"
+        >
+          {username}
+        </span>
       </div>
 
       {/* Image */}

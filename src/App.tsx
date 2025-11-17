@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import CreatePost from "./pages/CreatePost";
 import PostDetail from "./pages/PostDetail";
 import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 import Search from "./pages/Search";
 import Activity from "./pages/Activity";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
             <Route path="/post/:postId" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/profile/:username" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
             <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
