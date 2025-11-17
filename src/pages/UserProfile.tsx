@@ -5,8 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFollow } from "@/hooks/useFollow";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Grid3X3, ArrowLeft } from "lucide-react";
+import { Loader2, Grid3X3, ArrowLeft, MessageCircle } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
+import { toast } from "@/hooks/use-toast";
 
 interface ProfileData {
   id: string;
@@ -30,6 +31,7 @@ const UserProfile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creatingConversation, setCreatingConversation] = useState(false);
   
   const { isFollowing, toggleFollow, loading: followLoading } = useFollow(profile?.id);
 
@@ -47,7 +49,6 @@ const UserProfile = () => {
 
       if (profileError) throw profileError;
 
-      // Eğer kendi profilimizse yönlendir
       if (profileData.id === user?.id) {
         navigate("/profile");
         return;
@@ -67,6 +68,58 @@ const UserProfile = () => {
       console.error("Error fetching profile:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!user || !profile) return;
+
+    setCreatingConversation(true);
+    try {
+      const { data: existingParticipants } = await supabase
+        .from("conversation_participants")
+        .select("conversation_id")
+        .eq("user_id", user.id);
+
+      if (existingParticipants) {
+        for (const participant of existingParticipants) {
+          const { data: otherParticipant } = await supabase
+            .from("conversation_participants")
+            .select("conversation_id")
+            .eq("conversation_id", participant.conversation_id)
+            .eq("user_id", profile.id)
+            .single();
+
+          if (otherParticipant) {
+            navigate(`/messages/${participant.conversation_id}`);
+            return;
+          }
+        }
+      }
+
+      const { data: newConversation, error: convError } = await supabase
+        .from("conversations")
+        .insert({})
+        .select()
+        .single();
+
+      if (convError) throw convError;
+
+      const { error: participantsError } = await supabase
+        .from("conversation_participants")
+        .insert([
+          { conversation_id: newConversation.id, user_id: user.id },
+          { conversation_id: newConversation.id, user_id: profile.id },
+        ]);
+
+      if (participantsError) throw participantsError;
+
+      navigate(`/messages/${newConversation.id}`);
+    } catch (error) {
+      console.error("Error creating conversation:", error);
+      toast({ description: "Bir hata oluştu", variant: "destructive" });
+    } finally {
+      setCreatingConversation(false);
     }
   };
 
@@ -137,20 +190,35 @@ const UserProfile = () => {
             )}
           </div>
 
-          <Button
-            variant={isFollowing ? "outline" : "default"}
-            className="w-full"
-            onClick={toggleFollow}
-            disabled={followLoading}
-          >
-            {followLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : isFollowing ? (
-              "Takipten Çık"
-            ) : (
-              "Takip Et"
-            )}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant={isFollowing ? "outline" : "default"}
+              className="flex-1"
+              onClick={toggleFollow}
+              disabled={followLoading}
+            >
+              {followLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : isFollowing ? (
+                "Takipten Çık"
+              ) : (
+                "Takip Et"
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleSendMessage}
+              disabled={creatingConversation}
+            >
+              {creatingConversation ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <MessageCircle className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
         </div>
 
         <div className="border-t border-border">
