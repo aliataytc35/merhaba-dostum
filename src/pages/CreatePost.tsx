@@ -15,6 +15,7 @@ const CreatePost = () => {
   const [caption, setCaption] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
   const [uploading, setUploading] = useState(false);
 
   const takePhoto = async () => {
@@ -54,6 +55,7 @@ const CreatePost = () => {
         const blob = await response.blob();
         const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
         setImageFile(file);
+        setMediaType("image");
       }
     } catch (error) {
       console.error("Error picking photo:", error);
@@ -61,36 +63,57 @@ const CreatePost = () => {
     }
   };
 
+  const pickVideo = async () => {
+    try {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "video/*";
+      input.onchange = async (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          setImageFile(file);
+          setImagePreview(URL.createObjectURL(file));
+          setMediaType("video");
+        }
+      };
+      input.click();
+    } catch (error) {
+      console.error("Error picking video:", error);
+      toast.error("Video seçilemedi");
+    }
+  };
+
   const handleSubmit = async () => {
     if (!imageFile || !user) {
-      toast.error("Lütfen bir fotoğraf seçin");
+      toast.error("Lütfen bir medya seçin");
       return;
     }
 
     setUploading(true);
 
     try {
-      // Upload image to storage
       const fileExt = imageFile.name.split(".").pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const bucket = mediaType === "video" ? "videos" : "posts";
 
       const { error: uploadError } = await supabase.storage
-        .from("posts")
+        .from(bucket)
         .upload(fileName, imageFile);
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from("posts")
+        .from(bucket)
         .getPublicUrl(fileName);
 
-      // Create post in database
       const { error: postError } = await supabase
         .from("posts")
         .insert({
           user_id: user.id,
-          image_url: publicUrl,
+          image_url: mediaType === "image" ? publicUrl : null,
+          video_url: mediaType === "video" ? publicUrl : null,
+          media_type: mediaType,
           caption: caption.trim() || null,
         });
 
@@ -143,16 +166,32 @@ const CreatePost = () => {
               <ImageIcon className="w-8 h-8" />
               <span>Galeriden Seç</span>
             </Button>
+            <Button
+              onClick={pickVideo}
+              className="w-full h-32 flex flex-col gap-2"
+              variant="outline"
+            >
+              <ImageIcon className="w-8 h-8" />
+              <span>Video Seç</span>
+            </Button>
           </div>
         ) : (
           <div className="space-y-3">
-            {/* Image Preview */}
+            {/* Media Preview */}
             <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
+              {mediaType === "video" ? (
+                <video
+                  src={imagePreview}
+                  controls
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             {/* Caption Input */}

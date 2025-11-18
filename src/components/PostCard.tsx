@@ -10,7 +10,9 @@ interface PostCardProps {
   id: string;
   username: string;
   avatarUrl: string | null;
-  postImage: string;
+  postImage: string | null;
+  postVideo: string | null;
+  mediaType: string;
   likes: number;
   caption: string | null;
   createdAt: string;
@@ -23,7 +25,9 @@ export const PostCard = ({
   id,
   username, 
   avatarUrl,
-  postImage, 
+  postImage,
+  postVideo,
+  mediaType,
   likes, 
   caption, 
   createdAt,
@@ -62,13 +66,21 @@ export const PostCard = ({
         </span>
       </div>
 
-      {/* Image */}
+      {/* Media */}
       <AspectRatio ratio={1}>
-        <img 
-          src={postImage} 
-          alt={`Post by ${username}`} 
-          className="w-full h-full object-cover" 
-        />
+        {mediaType === "video" && postVideo ? (
+          <video 
+            src={postVideo}
+            controls
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <img 
+            src={postImage || ""} 
+            alt={`Post by ${username}`} 
+            className="w-full h-full object-cover" 
+          />
+        )}
       </AspectRatio>
 
       {/* Actions */}

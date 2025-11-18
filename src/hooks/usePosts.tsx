@@ -5,7 +5,9 @@ import { useAuth } from "./useAuth";
 export interface Post {
   id: string;
   user_id: string;
-  image_url: string;
+  image_url: string | null;
+  video_url: string | null;
+  media_type: string;
   caption: string | null;
   created_at: string;
   profile: {

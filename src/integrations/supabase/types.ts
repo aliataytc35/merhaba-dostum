@@ -230,24 +230,30 @@ export type Database = {
           created_at: string
           id: string
           image_url: string
+          media_type: string | null
           updated_at: string
           user_id: string
+          video_url: string | null
         }
         Insert: {
           caption?: string | null
           created_at?: string
           id?: string
           image_url: string
+          media_type?: string | null
           updated_at?: string
           user_id: string
+          video_url?: string | null
         }
         Update: {
           caption?: string | null
           created_at?: string
           id?: string
           image_url?: string
+          media_type?: string | null
           updated_at?: string
           user_id?: string
+          video_url?: string | null
         }
         Relationships: [
           {
