@@ -51,6 +51,8 @@ const Index = () => {
               username={post.profile.username}
               avatarUrl={post.profile.avatar_url}
               postImage={post.image_url}
+              postVideo={post.video_url}
+              mediaType={post.media_type}
               likes={post.likes_count}
               caption={post.caption}
               createdAt={post.created_at}
