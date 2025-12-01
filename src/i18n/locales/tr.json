@@ -1,0 +1,41 @@
+{
+  "profile": {
+    "posts": "gönderi",
+    "followers": "takipçi",
+    "following": "takip",
+    "edit": "Profili Düzenle",
+    "editTitle": "Profili Düzenle",
+    "fullName": "Ad Soyad",
+    "bio": "Biyografi",
+    "bioPlaceholder": "Kendinizden bahsedin...",
+    "namePlaceholder": "Adınız ve soyadınız",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "noPosts": "Henüz gönderi yok",
+    "shareFirst": "İlk gönderini paylaş",
+    "postsTitle": "GÖNDERİLER",
+    "updated": "Profil güncellendi",
+    "updateError": "Profil güncellenemedi",
+    "loadError": "Profil yüklenemedi"
+  },
+  "auth": {
+    "signOut": "Çıkış Yap",
+    "signIn": "Giriş Yap",
+    "signUp": "Kayıt Ol",
+    "email": "E-posta",
+    "password": "Şifre",
+    "username": "Kullanıcı Adı"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "notFound": "Bulunamadı",
+    "error": "Bir hata oluştu"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "search": "Ara",
+    "create": "Oluştur",
+    "messages": "Mesajlar",
+    "profile": "Profil"
+  }
+}

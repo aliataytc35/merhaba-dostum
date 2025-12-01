@@ -1,0 +1,41 @@
+{
+  "profile": {
+    "posts": "posts",
+    "followers": "followers",
+    "following": "following",
+    "edit": "Edit Profile",
+    "editTitle": "Edit Profile",
+    "fullName": "Full Name",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself...",
+    "namePlaceholder": "Your full name",
+    "save": "Save",
+    "cancel": "Cancel",
+    "noPosts": "No posts yet",
+    "shareFirst": "Share your first post",
+    "postsTitle": "POSTS",
+    "updated": "Profile updated",
+    "updateError": "Failed to update profile",
+    "loadError": "Failed to load profile"
+  },
+  "auth": {
+    "signOut": "Sign Out",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username"
+  },
+  "common": {
+    "loading": "Loading...",
+    "notFound": "Not Found",
+    "error": "An error occurred"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "create": "Create",
+    "messages": "Messages",
+    "profile": "Profile"
+  }
+}
