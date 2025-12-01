@@ -18,6 +18,8 @@ import Messages from "./pages/Messages";
 import ChatDetail from "./pages/ChatDetail";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import CreateStory from "./pages/CreateStory";
+import StoryViewer from "./pages/StoryViewer";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
             <Route path="/messages/:conversationId" element={<ProtectedRoute><ChatDetail /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/create-story" element={<ProtectedRoute><CreateStory /></ProtectedRoute>} />
+            <Route path="/story" element={<ProtectedRoute><StoryViewer /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
