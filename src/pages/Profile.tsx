@@ -4,6 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Grid3X3, LogOut, Settings, Camera } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useTranslation } from "react-i18next";
+import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -28,6 +32,8 @@ interface Post {
 
 const Profile = () => {
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -68,7 +74,7 @@ const Profile = () => {
       setPosts(postsResult.data || []);
     } catch (error) {
       console.error("Error fetching profile:", error);
-      toast.error("Profil yüklenemedi");
+      toast.error(t('profile.loadError'));
     } finally {
       setLoading(false);
     }
@@ -131,12 +137,12 @@ const Profile = () => {
 
       if (error) throw error;
 
-      toast.success("Profil güncellendi");
+      toast.success(t('profile.updated'));
       setEditDialogOpen(false);
       fetchProfileData();
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error("Profil güncellenemedi");
+      toast.error(t('profile.updateError'));
     } finally {
       setUpdating(false);
     }
@@ -162,14 +168,18 @@ const Profile = () => {
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 bg-background border-b border-border z-40 px-4 h-14 flex items-center justify-between">
         <h1 className="text-lg font-semibold">{profile.username}</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleSignOut}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleSignOut}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
+        </div>
       </header>
 
       <div className="max-w-md mx-auto">
@@ -187,15 +197,15 @@ const Profile = () => {
               <div className="flex items-center gap-6 mb-2">
                 <div className="text-center">
                   <div className="font-semibold text-lg">{posts.length}</div>
-                  <div className="text-sm text-muted-foreground">gönderi</div>
+                  <div className="text-sm text-muted-foreground">{t('profile.posts')}</div>
                 </div>
                 <div className="text-center">
                   <div className="font-semibold text-lg">{profile.followers_count}</div>
-                  <div className="text-sm text-muted-foreground">takipçi</div>
+                  <div className="text-sm text-muted-foreground">{t('profile.followers')}</div>
                 </div>
                 <div className="text-center">
                   <div className="font-semibold text-lg">{profile.following_count}</div>
-                  <div className="text-sm text-muted-foreground">takip</div>
+                  <div className="text-sm text-muted-foreground">{t('profile.following')}</div>
                 </div>
               </div>
             </div>
@@ -214,55 +224,32 @@ const Profile = () => {
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full" onClick={handleEditClick}>
                 <Settings className="w-4 h-4 mr-2" />
-                Profili Düzenle
+                {t('profile.edit')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Profili Düzenle</DialogTitle>
+                <DialogTitle>{t('profile.editTitle')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="flex flex-col items-center gap-2">
-                  <div className="relative">
-                    <Avatar className="w-24 h-24">
-                      <AvatarImage src={avatarPreview || undefined} />
-                      <AvatarFallback className="text-3xl">
-                        {profile.username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <label 
-                      htmlFor="avatar-upload"
-                      className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 cursor-pointer hover:bg-primary/90"
-                    >
-                      <Camera className="w-4 h-4" />
-                    </label>
-                    <input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                    />
-                  </div>
-                </div>
-
+...
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Ad Soyad</Label>
+                  <Label htmlFor="full_name">{t('profile.fullName')}</Label>
                   <Input
                     id="full_name"
                     value={editForm.full_name}
                     onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                    placeholder="Adınız ve soyadınız"
+                    placeholder={t('profile.namePlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Biyografi</Label>
+                  <Label htmlFor="bio">{t('profile.bio')}</Label>
                   <Textarea
                     id="bio"
                     value={editForm.bio}
                     onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                    placeholder="Kendinizden bahsedin..."
+                    placeholder={t('profile.bioPlaceholder')}
                     rows={4}
                   />
                 </div>
@@ -274,7 +261,7 @@ const Profile = () => {
                     onClick={() => setEditDialogOpen(false)}
                     disabled={updating}
                   >
-                    İptal
+                    {t('profile.cancel')}
                   </Button>
                   <Button
                     className="flex-1"
@@ -284,7 +271,7 @@ const Profile = () => {
                     {updating ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      "Kaydet"
+                      t('profile.save')
                     )}
                   </Button>
                 </div>
@@ -292,27 +279,34 @@ const Profile = () => {
             </DialogContent>
           </Dialog>
 
-          <Button variant="outline" className="w-full">
-            Profili Düzenle
-          </Button>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              className="w-full mt-2"
+              onClick={() => navigate("/admin")}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Admin Paneli
+            </Button>
+          )}
         </div>
 
         {/* Posts Grid */}
         <div className="border-t border-border">
           <div className="flex items-center justify-center gap-2 py-3 border-b border-border">
             <Grid3X3 className="w-5 h-5" />
-            <span className="text-sm font-semibold">GÖNDERİLER</span>
+            <span className="text-sm font-semibold">{t('profile.postsTitle')}</span>
           </div>
 
           {posts.length === 0 ? (
             <div className="py-16 text-center">
-              <div className="text-muted-foreground mb-2">Henüz gönderi yok</div>
+              <div className="text-muted-foreground mb-2">{t('profile.noPosts')}</div>
               <Button
                 variant="link"
                 onClick={() => navigate("/create")}
                 className="text-primary"
               >
-                İlk gönderini paylaş
+                {t('profile.shareFirst')}
               </Button>
             </div>
           ) : (
