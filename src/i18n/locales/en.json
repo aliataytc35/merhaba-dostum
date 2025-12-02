@@ -16,7 +16,9 @@
     "postsTitle": "POSTS",
     "updated": "Profile updated",
     "updateError": "Failed to update profile",
-    "loadError": "Failed to load profile"
+    "loadError": "Failed to load profile",
+    "fullNameTooLong": "Full name must be 100 characters or less",
+    "bioTooLong": "Bio must be 500 characters or less"
   },
   "auth": {
     "signOut": "Sign Out",

@@ -16,7 +16,9 @@
     "postsTitle": "GÖNDERİLER",
     "updated": "Profil güncellendi",
     "updateError": "Profil güncellenemedi",
-    "loadError": "Profil yüklenemedi"
+    "loadError": "Profil yüklenemedi",
+    "fullNameTooLong": "Ad soyad 100 karakterden fazla olamaz",
+    "bioTooLong": "Biyografi 500 karakterden fazla olamaz"
   },
   "auth": {
     "signOut": "Çıkış Yap",

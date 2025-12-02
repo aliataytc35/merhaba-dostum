@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { MobileNav } from "@/components/MobileNav";
+import { z } from "zod";
 
 interface ProfileData {
   username: string;
@@ -102,8 +103,26 @@ const Profile = () => {
     }
   };
 
+  const profileSchema = z.object({
+    full_name: z.string().max(100, t('profile.fullNameTooLong') || 'Full name must be 100 characters or less').optional(),
+    bio: z.string().max(500, t('profile.bioTooLong') || 'Bio must be 500 characters or less').optional(),
+  });
+
   const handleUpdateProfile = async () => {
     if (!user) return;
+
+    // Validate input
+    try {
+      profileSchema.parse({
+        full_name: editForm.full_name.trim() || undefined,
+        bio: editForm.bio.trim() || undefined,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+        return;
+      }
+    }
 
     setUpdating(true);
     try {
