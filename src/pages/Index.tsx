@@ -1,6 +1,7 @@
 import { MobileNav } from "@/components/MobileNav";
 import { PostCard } from "@/components/PostCard";
 import { StoriesBar } from "@/components/StoriesBar";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/hooks/useAuth";
 import { usePosts } from "@/hooks/usePosts";
 import { LogOut, Loader2 } from "lucide-react";
@@ -17,14 +18,17 @@ const Index = () => {
         <h1 className="text-2xl font-bold bg-gradient-to-r from-[hsl(var(--primary-gradient-start))] to-[hsl(var(--primary-gradient-end))] bg-clip-text text-transparent">
           izmirgram
         </h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={signOut}
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <NotificationBell />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={signOut}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
+        </div>
       </header>
 
       {/* Stories */}

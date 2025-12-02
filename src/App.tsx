@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import CreateStory from "./pages/CreateStory";
 import StoryViewer from "./pages/StoryViewer";
+import ActivityNew from "./pages/ActivityNew";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
             <Route path="/messages/:conversationId" element={<ProtectedRoute><ChatDetail /></ProtectedRoute>} />
             <Route path="/activity" element={<ProtectedRoute><Activity /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><ActivityNew /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="/create-story" element={<ProtectedRoute><CreateStory /></ProtectedRoute>} />
             <Route path="/story" element={<ProtectedRoute><StoryViewer /></ProtectedRoute>} />
